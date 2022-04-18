@@ -4,7 +4,7 @@ import { DatabasePool } from 'slonik/dist/src/types';
 import { sql } from 'slonik';
 
 type JokeConnector = {
-  getAll: () => Promise<Array<Joke>>;
+  getList: (limit?: number, offset?: number) => Promise<Array<Joke>>;
 };
 
 type JokeDataModel = {
@@ -16,8 +16,10 @@ type JokeDataModel = {
 };
 
 export const createJokeConnector = (db: DatabasePool = pool): JokeConnector => {
-  const getAll = async () => {
-    const raw = await db.query(sql<JokeDataModel>`SELECT * FROM joke;`);
+  const getList = async (limit: number = 10, offset: number = 0) => {
+    const raw = await db.query(
+      sql<JokeDataModel>`SELECT * FROM joke ORDER BY created_at LIMIT ${limit} OFFSET ${offset};`,
+    );
     if (raw.rows.length < 1) {
       return [];
     }
@@ -30,6 +32,6 @@ export const createJokeConnector = (db: DatabasePool = pool): JokeConnector => {
     }));
   };
   return {
-    getAll,
+    getList,
   };
 };

@@ -14,7 +14,7 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async () => {
   const data: LoaderData = {
-    jokeListItems: await createJokeConnector().getAll(),
+    jokeListItems: await createJokeConnector().getList(),
   };
   return json(data);
 };
