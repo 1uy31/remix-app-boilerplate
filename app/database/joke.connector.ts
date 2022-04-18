@@ -6,6 +6,7 @@ import { sql } from 'slonik';
 type JokeConnector = {
   getCount: () => Promise<number>;
   getList: (limit?: number, offset?: number) => Promise<Array<Joke>>;
+  getById: (id: string) => Promise<Joke | undefined>;
 };
 
 type JokeDataModel = {
@@ -15,6 +16,17 @@ type JokeDataModel = {
   created_at: string;
   updated_at: string | null;
 };
+
+/**
+ * Parse Joke in form of data model to domain model.
+ */
+const parseJoke = (data: JokeDataModel): Joke => ({
+  id: data.id,
+  name: data.name,
+  content: data.content,
+  createdAt: new Date(data.created_at),
+  updatedAt: data.updated_at ? new Date(data.updated_at) : null,
+});
 
 export const createJokeConnector = (db: DatabasePool = pool): JokeConnector => {
   const getCount = async () => {
@@ -34,17 +46,21 @@ export const createJokeConnector = (db: DatabasePool = pool): JokeConnector => {
     if (raw.rows.length < 1) {
       return [];
     }
-    return raw.rows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      content: row.content,
-      createdAt: new Date(row.created_at),
-      updatedAt: row.updated_at ? new Date(row.updated_at) : null,
-    }));
+    return raw.rows.map((row) => parseJoke(row));
+  };
+
+  const getById = async (id: string) => {
+    const raw = await db.query(sql<JokeDataModel>`SELECT * FROM joke WHERE id = ${id} LIMIT 1;`);
+
+    if (raw.rows.length !== 1) {
+      return undefined;
+    }
+    return parseJoke(raw.rows[0]);
   };
 
   return {
     getCount,
     getList,
+    getById,
   };
 };

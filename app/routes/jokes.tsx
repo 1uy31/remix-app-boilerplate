@@ -3,13 +3,14 @@ import { json, LinksFunction, LoaderFunction } from '@remix-run/node';
 import { createJokeConnector } from '~/database/joke.connector';
 
 import stylesUrl from '~/styles/jokes.css';
+import { Joke } from '~/domain.model';
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }];
 };
 
 type LoaderData = {
-  jokeListItems: Array<{ id: string; name: string }>;
+  jokeListItems: Array<Joke>;
 };
 
 export const loader: LoaderFunction = async () => {
