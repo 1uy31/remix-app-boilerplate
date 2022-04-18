@@ -29,10 +29,11 @@ To start your app in development mode, rebuilding assets on file changes.
 yarn dev
 ```
 
-Create a migration file:
+Create a migration file and run migrations:
 
 ```sh
 yarn migrate create <migration-file-name>
+yarn migrate up
 ```
 
 ## Deployment
