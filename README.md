@@ -10,6 +10,7 @@
 # TODO
 
 - Use Styled-Component, Material UI.
+- Find a way to separate domain and presentation layer.
 
 ## Development
 
