@@ -2,13 +2,16 @@
 
 - [Remix Docs](https://remix.run/docs)
 - Implement basing on this [Tutorial](https://remix.run/docs/en/v1/tutorials/jokes#jokes-app-tutorial) with some tweaks.
-  Tweaks:
+  
+Tweaks:
 - App structure.
 - Use slonik + node-pg-migrate instead of Prisma.
+- 
   ... to-be-updated ...
 
 # TODO
 
+- Authentication.
 - Use Styled-Component, Material UI.
 - Find a way to separate domain and presentation layer.
 
@@ -45,7 +48,8 @@ yarn migrate up
 ## Known issues:
 
 - https://github.com/remix-run/remix/issues/2737
-  Temporary work around: install pg-native
+
+Temporary work around: install pg-native
 
 ## Deployment
 
