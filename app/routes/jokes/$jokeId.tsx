@@ -5,12 +5,12 @@ import { throwIfUndefined } from '~/utils';
 import { Link, useLoaderData } from '@remix-run/react';
 
 type LoaderData = {
-    joke: Joke
+  joke: Joke;
 };
 
 export const loader: LoaderFunction = async ({ params }, jokeConnector: JokeConnector = createJokeConnector()) => {
   const jokeById = params.jokeId ? await jokeConnector.getById(params.jokeId) : undefined;
-  return json({joke: throwIfUndefined(jokeById, 'Joke not found')});
+  return json({ joke: throwIfUndefined(jokeById, 'Joke not found') });
 };
 
 const DetailJokeRoute = () => {

@@ -26,7 +26,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "slonik": "^28.1.0",
-    "yarn": "^1.22.18"
+    "yarn": "^1.22.18",
+    "zod": "^3.14.4"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.4.0",

@@ -7,6 +7,7 @@ export type JokeConnector = {
   getCount: () => Promise<number>;
   getList: (limit?: number, offset?: number) => Promise<Array<Joke>>;
   getById: (id: string) => Promise<Joke | undefined>;
+  create: (name: string, content: string) => Promise<Joke>;
 };
 
 type JokeDataModel = {
@@ -58,9 +59,17 @@ export const createJokeConnector = (db: DatabasePool = pool): JokeConnector => {
     return parseJoke(raw.rows[0]);
   };
 
+  const create = async (name: string, content: string) => {
+    const raw = await db.query(
+      sql<JokeDataModel>`INSERT INTO joke (name, content) VALUES (${name}, ${content}) RETURNING *;`,
+    );
+    return parseJoke(raw.rows[0]);
+  };
+
   return {
     getCount,
     getList,
     getById,
+    create,
   };
 };
