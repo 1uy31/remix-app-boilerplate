@@ -37,8 +37,9 @@ yarn migrate up
 ```
 
 ## Known issues:
+
 - https://github.com/remix-run/remix/issues/2737
-Temporary work around: install pg-native
+  Temporary work around: install pg-native
 
 ## Deployment
 
