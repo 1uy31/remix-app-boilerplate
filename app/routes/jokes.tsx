@@ -1,6 +1,6 @@
 import { Link, Outlet, useLoaderData } from '@remix-run/react';
 import { json, LinksFunction, LoaderFunction } from '@remix-run/node';
-import { createJokeConnector } from '~/database/joke.connector';
+import { createJokeConnector, JokeConnector } from '~/database/joke.connector';
 
 import stylesUrl from '~/styles/jokes.css';
 import { Joke } from '~/domain.model';
@@ -13,9 +13,9 @@ type LoaderData = {
   jokeListItems: Array<Joke>;
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({}, jokeConnector: JokeConnector = createJokeConnector()) => {
   const data: LoaderData = {
-    jokeListItems: await createJokeConnector().getList(),
+    jokeListItems: await jokeConnector.getList(),
   };
   return json(data);
 };

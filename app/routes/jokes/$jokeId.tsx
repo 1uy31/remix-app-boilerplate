@@ -1,25 +1,26 @@
 import { Joke } from '~/domain.model';
 import { json, LoaderFunction } from '@remix-run/node';
-import { createJokeConnector } from '~/database/joke.connector';
+import { createJokeConnector, JokeConnector } from '~/database/joke.connector';
 import { throwIfUndefined } from '~/utils';
 import { Link, useLoaderData } from '@remix-run/react';
 
-type LoaderData = Joke;
+type LoaderData = {
+    joke: Joke
+};
 
-export const loader: LoaderFunction = async ({ params }) => {
-  const joke = params.jokeId ? await createJokeConnector().getById(params.jokeId) : undefined;
-  const data: LoaderData = throwIfUndefined(joke, 'Joke not found');
-  return json(data);
+export const loader: LoaderFunction = async ({ params }, jokeConnector: JokeConnector = createJokeConnector()) => {
+  const jokeById = params.jokeId ? await jokeConnector.getById(params.jokeId) : undefined;
+  return json({joke: throwIfUndefined(jokeById, 'Joke not found')});
 };
 
 const DetailJokeRoute = () => {
-  const joke = useLoaderData<LoaderData>();
+  const data = useLoaderData<LoaderData>();
 
   return (
     <div>
       <p>Here's your hilarious joke:</p>
-      <p>{joke.content}</p>
-      <Link to=".">{joke.name} Permalink</Link>
+      <p>{data.joke.content}</p>
+      <Link to=".">{data.joke.name} Permalink</Link>
     </div>
   );
 };

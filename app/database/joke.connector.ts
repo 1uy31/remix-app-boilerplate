@@ -3,7 +3,7 @@ import { pool } from '~/database/pool';
 import { DatabasePool } from 'slonik/dist/src/types';
 import { sql } from 'slonik';
 
-type JokeConnector = {
+export type JokeConnector = {
   getCount: () => Promise<number>;
   getList: (limit?: number, offset?: number) => Promise<Array<Joke>>;
   getById: (id: string) => Promise<Joke | undefined>;
