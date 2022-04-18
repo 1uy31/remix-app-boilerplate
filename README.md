@@ -36,6 +36,10 @@ yarn migrate create <migration-file-name>
 yarn migrate up
 ```
 
+## Known issues:
+- https://github.com/remix-run/remix/issues/2737
+Temporary work around: install pg-native
+
 ## Deployment
 
 First, build your app for production:
