@@ -1,4 +1,4 @@
-import stylesUrl from '../styles/index.css';
+import stylesUrl from '~/styles/index.css';
 import { LinksFunction } from '@remix-run/node';
 
 export const links: LinksFunction = () => {
