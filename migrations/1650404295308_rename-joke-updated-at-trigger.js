@@ -17,5 +17,3 @@ exports.up = async (pgm) => {
  * Ignore on purpose.
  */
 exports.down = (pgm) => {};
-
-
