@@ -6,8 +6,11 @@ exports.shorthands = undefined;
 exports.up = async (pgm) => {
   await pgm.sql(`
     ALTER TABLE joke
-    ADD COLUMN user_id uuid
-    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES user_table(id)`);
+    ADD COLUMN user_id uuid;`);
+
+  await pgm.sql(`
+    ALTER TABLE joke
+    ADD CONSTRAINT fk_joke_user FOREIGN KEY (user_id) REFERENCES user_table(id);`);
 };
 
 /**
