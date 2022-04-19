@@ -4,6 +4,7 @@ export type Joke = {
   content: string;
   createdAt: Date;
   updatedAt: Date | null;
+  userId: string
 };
 
 export type User = {

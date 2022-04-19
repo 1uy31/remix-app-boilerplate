@@ -16,6 +16,7 @@ type JokeDataModel = {
   content: string;
   created_at: string;
   updated_at: string | null;
+  user_id: string;
 };
 
 /**
@@ -27,6 +28,7 @@ const parseJoke = (data: JokeDataModel): Joke => ({
   content: data.content,
   createdAt: new Date(data.created_at),
   updatedAt: data.updated_at ? new Date(data.updated_at) : null,
+  userId: data.user_id,
 });
 
 export const createJokeConnector = (db: DatabasePool = pool): JokeConnector => {
