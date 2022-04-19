@@ -2,12 +2,12 @@
 
 - [Remix Docs](https://remix.run/docs)
 - Implement basing on this [Tutorial](https://remix.run/docs/en/v1/tutorials/jokes#jokes-app-tutorial) with some tweaks.
-  
+
 Tweaks:
+
 - App structure.
 - Use slonik + node-pg-migrate instead of Prisma.
-- 
-  ... to-be-updated ...
+- ... to-be-updated ...
 
 # TODO
 
