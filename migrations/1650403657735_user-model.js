@@ -4,10 +4,10 @@ const { PgLiteral } = require('node-pg-migrate');
 exports.shorthands = undefined;
 
 /**
- * Data model for "user".
+ * Data model for "user_table" ("user" is reserved keyword in postgres and no need to insist on that name).
  */
 exports.up = async (pgm) => {
-  await pgm.createTable('user', {
+  await pgm.createTable('user_table', {
     id: {
       type: 'uuid',
       primaryKey: true,
@@ -29,7 +29,7 @@ exports.up = async (pgm) => {
   });
   await pgm.sql(`
     CREATE TRIGGER trg_user_updated_at
-    BEFORE UPDATE ON user
+    BEFORE UPDATE ON user_table
     FOR EACH ROW
     EXECUTE PROCEDURE trigger_set_timestamp();`);
 };
