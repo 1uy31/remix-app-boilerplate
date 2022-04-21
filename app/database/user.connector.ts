@@ -2,8 +2,12 @@ import { User } from '~/domain.model';
 import { pool } from '~/database/pool';
 import { DatabasePool } from 'slonik/dist/src/types';
 import { sql } from 'slonik';
+import bcrypt from 'bcryptjs';
 
-export type UserConnector = {};
+export type UserConnector = {
+  getByUsername: (username: string) => Promise<User | undefined>;
+  create: (username: string, password: string) => Promise<User>;
+};
 
 type UserDataModel = {
   id: string;
@@ -16,7 +20,7 @@ type UserDataModel = {
 /**
  * Parse User in form of data model to domain model.
  */
-const parseJoke = (data: UserDataModel): User => ({
+const parseUser = (data: UserDataModel): User => ({
   id: data.id,
   username: data.username,
   passwordHash: data.password_hash,
@@ -25,5 +29,21 @@ const parseJoke = (data: UserDataModel): User => ({
 });
 
 export const createUserConnector = (db: DatabasePool = pool): UserConnector => {
-  return {};
+  const getByUsername = async (username: string) => {
+    const raw = await db.query(sql<UserDataModel>`SELECT * FROM user WHERE username = ${username} LIMIT 1;`);
+
+    if (raw.rows.length !== 1) {
+      return undefined;
+    }
+    return parseUser(raw.rows[0]);
+  };
+
+  const create = async (username: string, password: string) => {
+    const passwordHash = await bcrypt.hash(password, 10);
+    const raw = await db.query(
+      sql<UserDataModel>`INSERT INTO user (username, password_hash) VALUES (${username}, ${passwordHash}) RETURNING *;`,
+    );
+    return parseUser(raw.rows[0]);
+  };
+  return { getByUsername, create };
 };
