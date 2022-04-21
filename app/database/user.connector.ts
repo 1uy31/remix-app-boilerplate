@@ -45,5 +45,9 @@ export const createUserConnector = (db: DatabasePool = pool): UserConnector => {
     );
     return parseUser(raw.rows[0]);
   };
-  return { getByUsername, create };
+
+  return {
+    getByUsername,
+    create,
+  };
 };
