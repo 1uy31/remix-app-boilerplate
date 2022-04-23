@@ -5,6 +5,7 @@ import { z, ZodError } from 'zod';
 import { createUserConnector, UserConnector } from '~/database/user.connector';
 import * as auth from '~/services/auth';
 import stylesUrl from '~/styles/login.css';
+import { getMessageFromZodIssues } from '~/utils';
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }];
@@ -66,18 +67,17 @@ export const action: ActionFunction = async ({ request }) => {
     if (!serviceHandler) return json({ formError: 'Invalid form action!' }, { status: 400 });
     return serviceHandler(validatedData.username, validatedData.password, redirectTo);
   } catch (err: any) {
-    console.error('routes/login.action', err)
+    console.error('routes/login.action', err);
     if (!(err instanceof ZodError)) {
       return json({ formError: err.message }, { status: 400 });
     }
 
     const fieldErrors = {
-      username: [err.issues.find((issue) => issue.path.includes('username'))].map((issue) => issue?.message),
-      password: [err.issues.find((issue) => issue.path.includes('password'))].map((issue) => issue?.message),
+      username: getMessageFromZodIssues(err.issues, 'username'),
+      password: getMessageFromZodIssues(err.issues, 'password'),
     };
-    const formError = [
-      err.issues.find((issue) => issue.path.includes('formType') || issue.path.includes('redirectUrl')),
-    ].map((issue) => issue?.message);
+    const formError =
+      getMessageFromZodIssues(err.issues, 'formType') || getMessageFromZodIssues(err.issues, 'redirectUrl');
 
     return json({ fieldErrors, formError }, { status: 400 });
   }

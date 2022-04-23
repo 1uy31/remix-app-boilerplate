@@ -2,6 +2,7 @@ import { ActionFunction, json, redirect } from '@remix-run/node';
 import { createJokeConnector, JokeConnector } from '~/database/joke.connector';
 import { useActionData } from '@remix-run/react';
 import { z, ZodError } from 'zod';
+import { getMessageFromZodIssues } from '~/utils';
 
 const newJokeInputsSchema = z.object({
   name: z
@@ -37,8 +38,8 @@ export const action: ActionFunction = async ({ request }, jokeConnector: JokeCon
   } catch (err: any) {
     if (err instanceof ZodError) {
       const fieldErrors = {
-        name: err.issues.map((issue) => (issue.path.includes('name') ? issue.message : undefined)),
-        content: err.issues.map((issue) => (issue.path.includes('content') ? issue.message : undefined)),
+        name: getMessageFromZodIssues(err.issues, 'name'),
+        content: getMessageFromZodIssues(err.issues, 'content'),
       };
       return json({ fieldErrors }, { status: 400 });
     }
