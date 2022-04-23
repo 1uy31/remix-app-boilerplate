@@ -5,7 +5,7 @@ import { z, ZodError } from 'zod';
 import { createUserConnector, UserConnector } from '~/database/user.connector';
 import { createAuthService } from '~/services/auth';
 import stylesUrl from '~/styles/login.css';
-import { getMessageFromZodIssues } from '~/utils';
+import { getMessageFromZodIssues, redirectWithAttachedSession } from '~/utils';
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }];
@@ -63,9 +63,10 @@ export const action: ActionFunction = async ({ request }) => {
     const validatedData = newUserInputsSchema.parse({ formType, username, password, redirectUrl });
     const redirectTo = URLS.includes(validatedData.redirectUrl) ? validatedData.redirectUrl : DEFAULT_REDIRECT_TO;
 
-    const serviceHandler = formTypeHandlerMapper[validatedData.formType];
-    if (!serviceHandler) return json({ formError: 'Invalid form action!' }, { status: 400 });
-    return serviceHandler(validatedData.username, validatedData.password, redirectTo);
+    const authHandler = formTypeHandlerMapper[validatedData.formType];
+    if (!authHandler) return json({ formError: 'Invalid form action!' }, { status: 400 });
+    const retrievedUsername = await authHandler(validatedData.username, validatedData.password);
+    return await redirectWithAttachedSession(retrievedUsername, redirectTo);
   } catch (err: any) {
     console.error('routes/login.action', err);
     if (!(err instanceof ZodError)) {

@@ -2,80 +2,55 @@ import bcrypt from 'bcryptjs';
 import { createCookieSessionStorage, redirect, SessionStorage } from '@remix-run/node';
 
 import { createUserConnector, UserConnector } from '~/database/user.connector';
-
-const SESSION_SECRET = process.env.SESSION_SECRET;
-if (!SESSION_SECRET) {
-  throw new Error('SESSION_SECRET must be set!');
-}
-const globalStorage = createCookieSessionStorage({
-  cookie: {
-    name: 'RJ_session',
-    secure: process.env.NODE_ENV === 'production',
-    secrets: [SESSION_SECRET],
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 30 * 24 * 60 * 60,
-    httpOnly: true,
-  },
-});
+import { globalStorage } from '~/sessionStorage';
 
 export type AuthService = {
-  register: (username: string, password: string, redirectTo: string) => Promise<Response>;
-  login: (username: string, password: string, redirectTo: string) => Promise<Response>;
+  /**
+   * Register and return username.
+   */
+  register: (username: string, password: string) => Promise<string>;
+  /**
+   * Login and return username.
+   */
+  login: (username: string, password: string) => Promise<string>;
+  getUsernameByCookie: (cookie: string | undefined) => Promise<string | undefined>;
 };
 
 export const createAuthService = (
   storage: SessionStorage = globalStorage,
   userConnector: UserConnector = createUserConnector(),
 ): AuthService => {
-  const redirectWithAttachedSession = async (userId: string, redirectTo: string) => {
-    const session = await storage.getSession();
-    session.set('userId', userId);
-    return redirect(redirectTo, {
-      headers: {
-        'Set-Cookie': await storage.commitSession(session),
-      },
-    });
-  };
-
-  const register = async (username: string, password: string, redirectTo: string) => {
+  const register = async (username: string, password: string): Promise<string> => {
     const user = await userConnector.getByUsername(username);
     if (user) throw new Error(`User with username ${username} already exists!`);
     const newUser = await userConnector.create(username, password);
-    return redirectWithAttachedSession(newUser.id, redirectTo);
+    return newUser.username;
   };
 
-  const login = async (username: string, password: string, redirectTo: string) => {
+  const login = async (username: string, password: string): Promise<string> => {
     const user = await userConnector.getByUsername(username);
     if (!user) throw new Error(`User with username ${username} does not exist!`);
     const isCorrectPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isCorrectPassword) throw new Error(`Password is incorrect!`);
-    return redirectWithAttachedSession(user.id, redirectTo);
+    return user.username;
   };
 
-  const getUserSession = (request: Request) => {
-    return storage.getSession(request.headers.get('Cookie'));
-  };
+  const getUsernameByCookie = async (cookie: string | undefined): Promise<string | undefined> => {
+    const userSession = await storage.getSession(cookie);
+    const username = userSession.get('username');
+    if (!username || typeof username !== 'string') return undefined;
 
-  const getUserId = async (request: Request) => {
-    const session = await getUserSession(request);
-    const userId = session.get('userId');
-    if (!userId || typeof userId !== 'string') return null;
-    return userId;
-  };
-
-  const requireUserId = async (request: Request, redirectTo: string = new URL(request.url).pathname) => {
-    const session = await getUserSession(request);
-    const userId = session.get('userId');
-
-    if (userId && typeof userId === 'string') return userId;
-
-    const searchParams = new URLSearchParams([['redirectTo', redirectTo]]);
-    throw redirect(`/login?${searchParams}`);
+    try {
+      const user = await userConnector.getByUsername(username);
+      return user?.username;
+    } catch {
+      return undefined;
+    }
   };
 
   return {
     register,
     login,
+    getUsernameByCookie,
   };
 };
