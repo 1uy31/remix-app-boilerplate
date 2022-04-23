@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { createCookieSessionStorage, redirect } from '@remix-run/node';
+import { createCookieSessionStorage, redirect, SessionStorage } from '@remix-run/node';
 
 import { createUserConnector, UserConnector } from '~/database/user.connector';
 
@@ -7,7 +7,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 if (!SESSION_SECRET) {
   throw new Error('SESSION_SECRET must be set!');
 }
-const storage = createCookieSessionStorage({
+const globalStorage = createCookieSessionStorage({
   cookie: {
     name: 'RJ_session',
     secure: process.env.NODE_ENV === 'production',
@@ -19,58 +19,63 @@ const storage = createCookieSessionStorage({
   },
 });
 
-const redirectWithAttachedSession = async (userId: string, redirectTo: string) => {
-  const session = await storage.getSession();
-  session.set('userId', userId);
-  return redirect(redirectTo, {
-    headers: {
-      'Set-Cookie': await storage.commitSession(session),
-    },
-  });
+export type AuthService = {
+  register: (username: string, password: string, redirectTo: string) => Promise<Response>;
+  login: (username: string, password: string, redirectTo: string) => Promise<Response>;
 };
 
-export const register = async (
-  username: string,
-  password: string,
-  redirectTo: string,
+export const createAuthService = (
+  storage: SessionStorage = globalStorage,
   userConnector: UserConnector = createUserConnector(),
-) => {
-  const user = await userConnector.getByUsername(username);
-  if (user) throw new Error(`User with username ${username} already exists!`);
-  const newUser = await userConnector.create(username, password);
-  return redirectWithAttachedSession(newUser.id, redirectTo);
-};
+): AuthService => {
+  const redirectWithAttachedSession = async (userId: string, redirectTo: string) => {
+    const session = await storage.getSession();
+    session.set('userId', userId);
+    return redirect(redirectTo, {
+      headers: {
+        'Set-Cookie': await storage.commitSession(session),
+      },
+    });
+  };
 
-export const login = async (
-  username: string,
-  password: string,
-  redirectTo: string,
-  userConnector: UserConnector = createUserConnector(),
-) => {
-  const user = await userConnector.getByUsername(username);
-  if (!user) throw new Error(`User with username ${username} does not exist!`);
-  const isCorrectPassword = await bcrypt.compare(password, user.passwordHash);
-  if (!isCorrectPassword) throw new Error(`Password is incorrect!`);
-  return redirectWithAttachedSession(user.id, redirectTo);
-};
+  const register = async (username: string, password: string, redirectTo: string) => {
+    const user = await userConnector.getByUsername(username);
+    if (user) throw new Error(`User with username ${username} already exists!`);
+    const newUser = await userConnector.create(username, password);
+    return redirectWithAttachedSession(newUser.id, redirectTo);
+  };
 
-const getUserSession = (request: Request) => {
-  return storage.getSession(request.headers.get('Cookie'));
-};
+  const login = async (username: string, password: string, redirectTo: string) => {
+    const user = await userConnector.getByUsername(username);
+    if (!user) throw new Error(`User with username ${username} does not exist!`);
+    const isCorrectPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isCorrectPassword) throw new Error(`Password is incorrect!`);
+    return redirectWithAttachedSession(user.id, redirectTo);
+  };
 
-export const getUserId = async (request: Request) => {
-  const session = await getUserSession(request);
-  const userId = session.get('userId');
-  if (!userId || typeof userId !== 'string') return null;
-  return userId;
-};
+  const getUserSession = (request: Request) => {
+    return storage.getSession(request.headers.get('Cookie'));
+  };
 
-export const requireUserId = async (request: Request, redirectTo: string = new URL(request.url).pathname) => {
-  const session = await getUserSession(request);
-  const userId = session.get('userId');
+  const getUserId = async (request: Request) => {
+    const session = await getUserSession(request);
+    const userId = session.get('userId');
+    if (!userId || typeof userId !== 'string') return null;
+    return userId;
+  };
 
-  if (userId && typeof userId === 'string') return userId;
+  const requireUserId = async (request: Request, redirectTo: string = new URL(request.url).pathname) => {
+    const session = await getUserSession(request);
+    const userId = session.get('userId');
 
-  const searchParams = new URLSearchParams([['redirectTo', redirectTo]]);
-  throw redirect(`/login?${searchParams}`);
+    if (userId && typeof userId === 'string') return userId;
+
+    const searchParams = new URLSearchParams([['redirectTo', redirectTo]]);
+    throw redirect(`/login?${searchParams}`);
+  };
+
+  return {
+    register,
+    login,
+  };
 };

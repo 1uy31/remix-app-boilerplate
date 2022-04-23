@@ -3,7 +3,7 @@ import { json } from '@remix-run/node';
 import { useActionData, Link, useSearchParams } from '@remix-run/react';
 import { z, ZodError } from 'zod';
 import { createUserConnector, UserConnector } from '~/database/user.connector';
-import * as auth from '~/services/auth';
+import { createAuthService } from '~/services/auth';
 import stylesUrl from '~/styles/login.css';
 import { getMessageFromZodIssues } from '~/utils';
 
@@ -17,8 +17,8 @@ enum FormType {
 }
 
 const formTypeHandlerMapper = {
-  [FormType.Login]: auth.login,
-  [FormType.Register]: auth.register,
+  [FormType.Login]: createAuthService().login,
+  [FormType.Register]: createAuthService().register,
 };
 
 const newUserInputsSchema = z.object({
