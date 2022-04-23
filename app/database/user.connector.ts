@@ -30,7 +30,7 @@ const parseUser = (data: UserDataModel): User => ({
 
 export const createUserConnector = (db: DatabasePool = pool): UserConnector => {
   const getByUsername = async (username: string) => {
-    const raw = await db.query(sql<UserDataModel>`SELECT * FROM user WHERE username = ${username} LIMIT 1;`);
+    const raw = await db.query(sql<UserDataModel>`SELECT * FROM user_table WHERE username = ${username} LIMIT 1;`);
 
     if (raw.rows.length !== 1) {
       return undefined;
@@ -41,7 +41,7 @@ export const createUserConnector = (db: DatabasePool = pool): UserConnector => {
   const create = async (username: string, password: string) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const raw = await db.query(
-      sql<UserDataModel>`INSERT INTO user (username, password_hash) VALUES (${username}, ${passwordHash}) RETURNING *;`,
+      sql<UserDataModel>`INSERT INTO user_table (username, password_hash) VALUES (${username}, ${passwordHash}) RETURNING *;`,
     );
     return parseUser(raw.rows[0]);
   };
