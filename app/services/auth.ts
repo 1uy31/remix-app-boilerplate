@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { createCookieSessionStorage, redirect, SessionStorage } from '@remix-run/node';
 
-import { createUserConnector, UserConnector } from '~/database/user.connector';
+import { createUserConnector, UserConnector } from '~/database/userConnector';
 import { globalStorage } from '~/sessionStorage';
 
 export type AuthService = {
@@ -43,7 +43,8 @@ export const createAuthService = (
     try {
       const user = await userConnector.getByUsername(username);
       return user?.username;
-    } catch {
+    } catch (err: any) {
+      console.error('services/auth.getUsernameByCookie', err);
       return undefined;
     }
   };

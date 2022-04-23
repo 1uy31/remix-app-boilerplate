@@ -1,6 +1,6 @@
-import { Joke } from '~/domain.model';
+import { Joke } from '~/domainModel';
 import { json, LoaderFunction } from '@remix-run/node';
-import { createJokeConnector, JokeConnector } from '~/database/joke.connector';
+import { createJokeConnector, JokeConnector } from '~/database/jokeConnector';
 import { throwIfUndefined } from '~/utils';
 import { Link, useLoaderData } from '@remix-run/react';
 

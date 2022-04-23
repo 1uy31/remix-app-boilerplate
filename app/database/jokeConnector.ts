@@ -1,4 +1,4 @@
-import { Joke } from '~/domain.model';
+import { Joke } from '~/domainModel';
 import { pool } from '~/database/pool';
 import { DatabasePool } from 'slonik/dist/src/types';
 import { sql } from 'slonik';

@@ -1,5 +1,5 @@
 import { ActionFunction, json, redirect } from '@remix-run/node';
-import { createJokeConnector, JokeConnector } from '~/database/joke.connector';
+import { createJokeConnector, JokeConnector } from '~/database/jokeConnector';
 import { useActionData } from '@remix-run/react';
 import { z, ZodError } from 'zod';
 import { getMessageFromZodIssues } from '~/utils';

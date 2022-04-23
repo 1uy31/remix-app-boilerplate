@@ -1,9 +1,9 @@
 import { Link, Outlet, useLoaderData } from '@remix-run/react';
 import { json, LinksFunction, LoaderFunction } from '@remix-run/node';
-import { createJokeConnector, JokeConnector } from '~/database/joke.connector';
+import { createJokeConnector, JokeConnector } from '~/database/jokeConnector';
 
 import stylesUrl from '~/styles/jokes.css';
-import { Joke } from '~/domain.model';
+import { Joke } from '~/domainModel';
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }];

@@ -2,7 +2,7 @@ import { ActionFunction, LinksFunction, redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useActionData, Link, useSearchParams } from '@remix-run/react';
 import { z, ZodError } from 'zod';
-import { createUserConnector, UserConnector } from '~/database/user.connector';
+import { createUserConnector, UserConnector } from '~/database/userConnector';
 import { createAuthService } from '~/services/auth';
 import stylesUrl from '~/styles/login.css';
 import { getMessageFromZodIssues, redirectWithAttachedSession } from '~/utils';
