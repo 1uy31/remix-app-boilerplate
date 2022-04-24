@@ -20,6 +20,9 @@ const getUserSession = (request: Request, storage: SessionStorage = globalStorag
   return storage.getSession(request.headers.get('Cookie'));
 };
 
+/**
+ * Using username as the key to store user's session data, and redirect to desired location.
+ */
 export const redirectWithAttachedSession = async (
   username: string,
   redirectTo: string,
@@ -34,6 +37,9 @@ export const redirectWithAttachedSession = async (
   });
 };
 
+/**
+ * Destroy user's associated session (log user out), and redirect to desired location.
+ */
 export const redirectWithClearedSession = async (
   request: Request,
   redirectTo: string,
