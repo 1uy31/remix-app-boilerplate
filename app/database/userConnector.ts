@@ -1,4 +1,4 @@
-import { User } from '~/domain.model';
+import { User } from '~/domainModel';
 import { pool } from '~/database/pool';
 import { DatabasePool } from 'slonik/dist/src/types';
 import { sql } from 'slonik';

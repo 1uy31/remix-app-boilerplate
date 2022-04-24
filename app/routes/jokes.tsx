@@ -4,18 +4,26 @@ import { createJokeConnector, JokeConnector } from '~/database/jokeConnector';
 
 import stylesUrl from '~/styles/jokes.css';
 import { Joke } from '~/domainModel';
+import { AuthService, createAuthService } from '~/services/auth';
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }];
 };
 
 type LoaderData = {
+  username: string | undefined;
   jokeListItems: Array<Joke>;
 };
 
-export const loader: LoaderFunction = async ({}, jokeConnector: JokeConnector = createJokeConnector()) => {
+export const loader: LoaderFunction = async (
+  { request },
+  jokeConnector: JokeConnector = createJokeConnector(),
+  authService: AuthService = createAuthService(),
+) => {
+  const username = await authService.getUsernameByCookie(request.headers.get('Cookie'));
   const data: LoaderData = {
     jokeListItems: await jokeConnector.getList(),
+    username,
   };
   return json(data);
 };
@@ -32,6 +40,18 @@ const JokesRoute = () => {
               <span className="logo-medium">J🤪KES</span>
             </Link>
           </h1>
+          {data.username ? (
+            <div className="user-info">
+              <span>{`Hi ${data.username}`}</span>
+              <form action="/logout" method="post">
+                <button type="submit" className="button">
+                  Logout
+                </button>
+              </form>
+            </div>
+          ) : (
+            <Link to="/login">Login</Link>
+          )}
         </div>
       </header>
       <main className="jokes-main">

@@ -12,6 +12,7 @@ Tweaks:
 # TODO
 
 - Authentication.
+- Get rid of joke-related-stuff and hence layers-mixing-logic.
 - Use Styled-Component, Material UI.
 - Find a way to separate domain and presentation layer.
 - Testing.

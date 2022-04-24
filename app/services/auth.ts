@@ -13,7 +13,7 @@ export type AuthService = {
    * Login and return username.
    */
   login: (username: string, password: string) => Promise<string>;
-  getUsernameByCookie: (cookie: string | undefined) => Promise<string | undefined>;
+  getUsernameByCookie: (cookie: string | null) => Promise<string | undefined>;
 };
 
 export const createAuthService = (
@@ -35,7 +35,7 @@ export const createAuthService = (
     return user.username;
   };
 
-  const getUsernameByCookie = async (cookie: string | undefined): Promise<string | undefined> => {
+  const getUsernameByCookie = async (cookie: string | null): Promise<string | undefined> => {
     const userSession = await storage.getSession(cookie);
     const username = userSession.get('username');
     if (!username || typeof username !== 'string') return undefined;
