@@ -5,15 +5,15 @@
 
 Tweaks:
 
-- App structure.
+- App structure and architecture.
 - Use slonik + node-pg-migrate instead of Prisma.
+- Use zod for schema validation.
 - ... to-be-updated ...
 
 # TODO
 
-- Use Styled-Component, Material UI.
 - Testing.
-- Explore more.
+- Use Styled-Component, Material UI.
 
 ## Development
 
