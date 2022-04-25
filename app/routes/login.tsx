@@ -3,8 +3,9 @@ import { json } from '@remix-run/node';
 import { useActionData, Link, useSearchParams } from '@remix-run/react';
 import { z, ZodError } from 'zod';
 import { createAuthService } from '~/services/auth';
+import { redirectWithAttachedSession } from '~/sessionUtils';
 import stylesUrl from '~/styles/login.css';
-import { getMessageFromZodIssues, redirectWithAttachedSession } from '~/utils';
+import { getMessageFromZodIssues } from '~/utils';
 
 export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }];

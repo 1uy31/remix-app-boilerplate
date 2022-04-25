@@ -11,8 +11,7 @@
     "migrate": "node-pg-migrate",
     "prettier": "prettier --write .",
     "lint": "eslint --fix",
-    "code": "tsc --noEmit && yarn prettier && yarn lint",
-    "seeding": "node data.seeding.js"
+    "code": "tsc --noEmit && yarn prettier && yarn lint"
   },
   "dependencies": {
     "@remix-run/node": "^1.4.0",

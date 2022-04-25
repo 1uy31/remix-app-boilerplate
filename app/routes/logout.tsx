@@ -1,6 +1,6 @@
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
-import { redirectWithClearedSession } from '~/utils';
+import { redirectWithClearedSession } from '~/sessionUtils';
 
 /**
  * Using an action (rather than a loader) to avoid CSRF problems by using a POST request rather than a GET request.
