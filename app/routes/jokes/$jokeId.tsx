@@ -2,7 +2,7 @@ import { Joke } from '~/domainModel';
 import { json, LoaderFunction } from '@remix-run/node';
 import { createJokeConnector, JokeConnector } from '~/database/jokeConnector';
 import { throwIfUndefined } from '~/utils';
-import { Link, useLoaderData } from '@remix-run/react';
+import { Link, useLoaderData, useParams } from '@remix-run/react';
 
 type LoaderData = {
   joke: Joke;
@@ -26,3 +26,8 @@ const DetailJokeRoute = () => {
 };
 
 export default DetailJokeRoute;
+
+export const ErrorBoundary = () => {
+  const { jokeId } = useParams();
+  return <div className="error-container">{`There was an error loading joke by the id ${jokeId}. Sorry.`}</div>;
+};

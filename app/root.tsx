@@ -24,21 +24,46 @@ export const links: LinksFunction = () => {
   ];
 };
 
-const App = () => {
+const Document = ({
+  children,
+  title = `Remix: So great, it's funny!`,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) => {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <title>Remix: So great, it's funny!</title>
+        <title>{title}</title>
         <Links />
       </head>
       <body>
-        {/*To watch for changes in filesystem, and rebuild the site*/}
-        <Outlet />
+        {children}
         <LiveReload /> {/*To auto-refresh browser during development*/}
       </body>
     </html>
   );
 };
 
+const App = () => {
+  return (
+    <Document>
+      {/*To watch for changes in filesystem, and rebuild the site*/}
+      <Outlet />
+    </Document>
+  );
+};
+
 export default App;
+
+export const ErrorBoundary = ({ error }: { error: Error }) => {
+  return (
+    <Document title="Uh-oh!">
+      <div className="error-container">
+        <h1>App Error</h1>
+        <pre>{error.message}</pre>
+      </div>
+    </Document>
+  );
+};
