@@ -1,8 +1,9 @@
-import { ActionFunction, json, redirect } from '@remix-run/node';
+import { ActionFunction, json, LoaderFunction, redirect } from '@remix-run/node';
 import { createJokeConnector, JokeConnector } from '~/database/jokeConnector';
-import { useActionData } from '@remix-run/react';
+import { Link, useActionData, useCatch } from '@remix-run/react';
 import { z, ZodError } from 'zod';
 import { getMessageFromZodIssues } from '~/utils';
+import { AuthService, createAuthService } from '~/services/auth';
 
 const newJokeInputsSchema = z.object({
   name: z
@@ -25,6 +26,14 @@ type ActionData = {
     name?: string;
     content?: string;
   };
+};
+
+export const loader: LoaderFunction = async ({ request }, authService: AuthService = createAuthService()) => {
+  const username = await authService.getUsernameByCookie(request.headers.get('Cookie'));
+  if (!username) {
+    throw new Response('Unauthorized', { status: 401 });
+  }
+  return json({});
 };
 
 export const action: ActionFunction = async ({ request }, jokeConnector: JokeConnector = createJokeConnector()) => {
@@ -91,6 +100,19 @@ const NewJokeRoute = () => {
 };
 
 export default NewJokeRoute;
+
+export const CatchBoundary = () => {
+  const caught = useCatch();
+
+  if (caught.status === 401) {
+    return (
+      <div className="error-container">
+        <p>You must be logged in to create a joke.</p>
+        <Link to="/login">Login</Link>
+      </div>
+    );
+  }
+};
 
 export const ErrorBoundary = () => {
   return <div className="error-container">Something unexpected went wrong. Sorry about that.</div>;
