@@ -2,7 +2,6 @@ import { ActionFunction, LinksFunction, redirect } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useActionData, Link, useSearchParams } from '@remix-run/react';
 import { z, ZodError } from 'zod';
-import { createUserConnector, UserConnector } from '~/database/userConnector';
 import { createAuthService } from '~/services/auth';
 import stylesUrl from '~/styles/login.css';
 import { getMessageFromZodIssues, redirectWithAttachedSession } from '~/utils';
@@ -21,7 +20,7 @@ const formTypeHandlerMapper = {
   [FormType.Register]: createAuthService().register,
 };
 
-const newUserInputsSchema = z.object({
+const userInputSchema = z.object({
   formType: z.nativeEnum(FormType),
   username: z
     .string({
@@ -51,24 +50,25 @@ type ActionData = {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  const URLS = ['/jokes', '/', 'https://remix.run'];
-  const DEFAULT_REDIRECT_TO = '/jokes';
+  const URLS = ['/home', '/'];
+  const DEFAULT_REDIRECT_TO = '/home';
   const form = await request.formData();
   const formType = form.get('formType');
   const username = form.get('username');
   const password = form.get('password');
-  const redirectUrl = form.get('redirectTo') || '/jokes';
+  const redirectUrl = form.get('redirectTo') || DEFAULT_REDIRECT_TO;
 
   try {
-    const validatedData = newUserInputsSchema.parse({ formType, username, password, redirectUrl });
+    const validatedData = userInputSchema.parse({ formType, username, password, redirectUrl });
     const redirectTo = URLS.includes(validatedData.redirectUrl) ? validatedData.redirectUrl : DEFAULT_REDIRECT_TO;
 
-    const authHandler = formTypeHandlerMapper[validatedData.formType];
-    if (!authHandler) return json({ formError: 'Invalid form action!' }, { status: 400 });
-    const retrievedUsername = await authHandler(validatedData.username, validatedData.password);
+    const authServiceHandler = formTypeHandlerMapper[validatedData.formType];
+    if (!authServiceHandler) return json({ formError: 'Invalid form action!' }, { status: 400 });
+    const retrievedUsername = await authServiceHandler(validatedData.username, validatedData.password);
     return await redirectWithAttachedSession(retrievedUsername, redirectTo);
   } catch (err: any) {
     console.error('routes/login.action', err);
+
     if (!(err instanceof ZodError)) {
       return json({ formError: err.message }, { status: 400 });
     }
@@ -84,7 +84,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 };
 
-const Login = () => {
+const LoginRoute = () => {
   const actionData = useActionData<ActionData>();
   const [searchParams] = useSearchParams();
   return (
@@ -135,10 +135,7 @@ const Login = () => {
       <div className="links">
         <ul>
           <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/jokes">Jokes</Link>
+            <Link to="/">Hello</Link>
           </li>
         </ul>
       </div>
@@ -146,4 +143,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginRoute;

@@ -6,7 +6,7 @@ export const links: LinksFunction = () => {
   return [{ rel: 'stylesheet', href: stylesUrl }];
 };
 
-const Index = () => {
+const IndexRoute = () => {
   return (
     <div className="container">
       <div className="content">
@@ -25,4 +25,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default IndexRoute;
